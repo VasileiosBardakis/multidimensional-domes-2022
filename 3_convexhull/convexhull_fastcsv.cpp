@@ -6,9 +6,9 @@
 #include <fstream>
 #include <time.h>
 #include <chrono>
+#include <iomanip>
 #include "convexhull_fastcsv.h"
 #include "csv.h"
-#include <iomanip>
 
 using namespace std;
 using namespace std::chrono;
@@ -22,7 +22,7 @@ int main()
     //Point:
     //1.longitude (x)
     //2.latitude (y)
-    using Point = std::pair<int,int>;
+    //using Point = std::pair<int,int>;
     vector<Point> points, result;
 
     int lowPrice = 0;
@@ -57,6 +57,7 @@ int main()
     start = high_resolution_clock::now();
     //convexhull function
     //CGAL::convex_hull_2(points.begin(), points.end(), back_inserter(result));
+    convex_hull(points, result);
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start);
     auto duration_in_micro = duration_cast<microseconds>(stop - start);
