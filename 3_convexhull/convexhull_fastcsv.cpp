@@ -8,17 +8,22 @@
 #include <chrono>
 #include "convexhull_fastcsv.h"
 #include "csv.h"
+#include <iomanip>
 
 using namespace std;
 using namespace std::chrono;
 
 //typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 //typedef K::Point_2 Point_2;
-typedef std::vector<Point_2> Points;
+//typedef std::vector<Point_2> Points;
 
 int main()
 {
-    Points points, result;
+    //Point:
+    //1.longitude (x)
+    //2.latitude (y)
+    using Point = std::pair<int,int>;
+    vector<Point> points, result;
 
     int lowPrice = 0;
     int highPrice = 999;
@@ -37,12 +42,13 @@ int main()
     //https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
     auto start = high_resolution_clock::now();
 
-        io::CSVReader<3> in("airbnb_listings_usa.csv");
-        in.read_header(io::ignore_extra_column, "latitude", "longitude", "price");
-        float latitude; double longitude; int price;
-        while (in.read_row(latitude, longitude, price))
-            if ((price >= lowPrice) && (price <= highPrice))
-                points.push_back(Point_2(latitude, longitude));
+    io::CSVReader<3> in("airbnb_listings_usa.csv");
+    in.read_header(io::ignore_extra_column, "latitude", "longitude", "price");
+    float latitude; double longitude; int price;
+    while (in.read_row(latitude, longitude, price))
+        if ((price >= lowPrice) && (price <= highPrice)) {
+            points.push_back({longitude, latitude});
+        }
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
@@ -50,7 +56,7 @@ int main()
 
     start = high_resolution_clock::now();
     //convexhull function
-    CGAL::convex_hull_2(points.begin(), points.end(), back_inserter(result));
+    //CGAL::convex_hull_2(points.begin(), points.end(), back_inserter(result));
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start);
     auto duration_in_micro = duration_cast<microseconds>(stop - start);
@@ -76,8 +82,12 @@ int main()
     cout << points.size() << " points on the dataset" << endl;
     cout << result.size() << " points on the convex hull" << endl;
 
-    for (auto point : result)
-        cout << point << endl;
+    // Using auto with a range-based for loop to iterate through the vector of pairs
+    int i=0;
+    for (const auto& point : result) {
+        cout << i << ". x: " << point.first << " y: " << point.second << endl;
+
+    }
 
     return 0;
 }
