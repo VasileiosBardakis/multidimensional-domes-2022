@@ -1,14 +1,15 @@
 #include <vector>
 #include <iostream>
+using namespace std;
 using Point = pair<int,int>;
 
 int orientation(Point p, Point q, Point r) {
     /*
+    Given a vector of points, calculate orientation of top 3
     Orientation of p, q, r
     0: colinear
     1: clockwise
     2: counter-clockwise
-    
     */
 }
 
@@ -17,7 +18,6 @@ bool onSegment(Point p, Point q) {
     true:   
     false:
     */
-
 }
 
 bool doesIntersect(Point p, Point q) {
@@ -32,7 +32,7 @@ bool compare_x(Point p, Point q) {
     return (p.first < q.first);
 }
 
-void convex_hull(vector<Point> points, vector<Point> result) {
+void convex_hull(vector<Point> &points, vector<Point> &result) {
     /*
     Iterates Points using vector iterator,
     finds its convex hull,
@@ -51,21 +51,35 @@ void convex_hull(vector<Point> points, vector<Point> result) {
     TODO: colinear?
     */
     for (const auto& point: points) {
-        //push next point
         result.push_back(point);
 
-        //Cant compute orientation with 2 elements
-        if (point == points.front() || point == points.begin()[1]) 
+        //Can't compute orientation with 2 elements
+        if (point == points.begin()[0] || point == points.begin()[1]) 
             continue;
 
-
-
-        //
+        //???: if (stack.size() >= 3)
+        //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
+        while(orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]) == 2)
+            result.erase(result.end()-2);
     }
 
     /*
     Right to left scan:
     -//-
     */
+    //https://stackoverflow.com/questions/8542591/c11-reverse-range-based-for-loop
+    for (const auto& point: points) {
+        result.push_back(point);
+
+        //Can't compute orientation with 2 elements
+        if (point == points.begin()[0] || point == points.begin()[1]) 
+            continue;
+
+        //???: if (stack.size() >= 3)
+        //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
+        while(orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]) == 2)
+            result.erase(result.end()-2);
+    }
+
 
 }
