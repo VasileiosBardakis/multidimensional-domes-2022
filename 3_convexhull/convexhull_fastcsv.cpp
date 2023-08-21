@@ -19,24 +19,26 @@ using namespace std::chrono;
 
 int main()
 {
-    //Point:
-    //1.longitude (x)
-    //2.latitude (y)
-    //using Point = std::pair<int,int>;
+    /*
+    Point:
+    1.longitude (x)
+    2.latitude (y)
+    */
     vector<Point> points, result;
 
     int lowPrice = 0;
     int highPrice = 999;
-    int limit;
+    int limit = 10;
+    int current_points = 0;
+    //TODO: Might remove these after, only used for debugging.
+    //cout << "Enter the lowest price of airbnb: " << endl;
+    //cin >> lowPrice;
 
-    cout << "Enter the lowest price of airbnb: " << endl;
-    cin >> lowPrice;
-
-    cout << "Enter the highest price of airbnb: " << endl;
-    cin >> highPrice;
+    //cout << "Enter the highest price of airbnb: " << endl;
+    //cin >> highPrice;
 
     cout << "Limit dataset to how many points?" << endl;
-    cin >> limit;
+    //cin >> limit;
     
     
     //https://stackoverflow.com/questions/14391327/how-to-get-duration-as-int-millis-and-float-seconds-from-chrono
@@ -46,8 +48,11 @@ int main()
     in.read_header(io::ignore_extra_column, "latitude", "longitude", "price");
     float latitude; double longitude; int price;
     while (in.read_row(latitude, longitude, price))
-        if ((price >= lowPrice) && (price <= highPrice)) {
+    //    if ((price >= lowPrice) && (price <= highPrice)) 
+        {
+            if (current_points > limit) break;
             points.push_back({longitude, latitude});
+            current_points++;
         }
 
     auto stop = high_resolution_clock::now();
@@ -63,23 +68,23 @@ int main()
     auto duration_in_micro = duration_cast<microseconds>(stop - start);
     cout << "Convex hull took: " << duration.count() << setprecision(5) << "ms or " << duration_in_micro.count() << "us." << endl;
 
+    /* Benchmarking 
+    for (int i = 0; i < 5; i++) {
 
-    //for (int i = 0; i < 5; i++) {
+        Points::const_iterator first = points.begin();
+        Points::const_iterator last = points.begin() + 3 * pow(10, i);
 
-    //    Points::const_iterator first = points.begin();
-    //    Points::const_iterator last = points.begin() + 3 * pow(10, i);
+        Points newVec(first, last);
 
-    //    Points newVec(first, last);
-
-    //    start = high_resolution_clock::now();
-    //    CGAL::convex_hull_2(newVec.begin(), newVec.end(), back_inserter(result));
-    //    stop = high_resolution_clock::now();
-    //    duration = duration_cast<milliseconds>(stop - start);
-    //    auto duration_in_micro = duration_cast<microseconds>(stop - start);
-    //    cout << 3 * pow(10, i) << ": ";
-    //    cout << "Convex hull took: " << duration.count() << setprecision(5) << "ms or " << duration_in_micro.count() << "us" << endl;
-    //}
-
+        start = high_resolution_clock::now();
+        CGAL::convex_hull_2(newVec.begin(), newVec.end(), back_inserter(result));
+        stop = high_resolution_clock::now();
+        duration = duration_cast<milliseconds>(stop - start);
+        auto duration_in_micro = duration_cast<microseconds>(stop - start);
+        cout << 3 * pow(10, i) << ": ";
+        cout << "Convex hull took: " << duration.count() << setprecision(5) << "ms or " << duration_in_micro.count() << "us" << endl;
+    }
+    */
     cout << points.size() << " points on the dataset" << endl;
     cout << result.size() << " points on the convex hull" << endl;
 
