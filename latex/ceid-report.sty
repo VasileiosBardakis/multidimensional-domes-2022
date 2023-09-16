@@ -1,0 +1,184 @@
+\ProvidesPackage{ceid-report}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Make subsubsections not have counting (they are too specific).
+
+\RequirePackage[utf8]{vntex,inputenc}
+
+\RequirePackage{geometry,graphicx,indentfirst,setspace}
+\RequirePackage{anyfontsize}
+\RequirePackage{booktabs}
+\RequirePackage{fancyhdr,lastpage,hyperref}
+\RequirePackage{tocloft}
+
+% Change to '[english,vietnamese]' to use Vietnamese labels
+\RequirePackage[greek, english]{babel}
+\RequirePackage{alphabeta}
+
+% Draft watermark
+% https://github.com/callegar/LaTeX-draftwatermark
+
+%\graphicspath{{subdir1/}{subdir2/}{subdir3/}...{subdirn/}}
+
+\renewcommand\thesection{Μέρος \Alph{section}:}
+\renewcommand\thesubsection{\Alph{section}.\roman{subsection}}
+\renewcommand\thesubsubsection{\Alph{section}.\roman{subsection}.\alph{subsubsection}}
+\addtolength{\cftsecnumwidth}{52pt}
+
+\newcommand{\Month}{
+  \ifcase \the\month
+  \or January
+  \or February
+  \or March
+  \or April
+  \or May
+  \or June
+  \or July
+  \or August
+  \or September
+  \or October
+  \or November
+  \or December
+  \fi
+}
+
+\newcommand{\@deptname}{Τμήμα Μηχανικών Ηλεκτρονικών Υπολογιστών και Πληροφορικής}
+\newcommand{\odeptname}[1]{\renewcommand{\@deptname}{#1}}
+
+\newcommand{\@coursename}{Λειτουργικά Συστήματα}
+\newcommand{\ocoursename}[1]{\renewcommand{\@coursename}{#1}}
+
+\newcommand{\@reporttype}{Assignment Report}
+\newcommand{\oreporttype}[1]{\renewcommand{\@reporttype}{#1}}
+
+\renewcommand{\@title}{Report title}
+\newcommand{\otitle}[1]{\renewcommand{\@title}{#1}}
+
+\newcommand{\@advisor}{Advisor}
+\newcommand{\oadvisor}[1]{\renewcommand{\@advisor}{#1}}
+
+\newcommand{\@reportplace}{Πάτρα}
+\newcommand{\oreportplace}[1]{\renewcommand{\@reportplace}{#1}}
+
+\newcommand{\@reporttime}{Δεκέμβριος 2022}
+\newcommand{\oreporttime}[1]{\renewcommand{\@reporttime}{#1}}
+
+\def\reportlayout{
+  \geometry{
+    paper=a4paper,
+    vmargin=1cm,
+    hmargin=2cm,
+    includeheadfoot=true,
+    headheight=5pt
+  }
+
+  \onehalfspacing%
+
+  % Allow page breaks inside align* environment
+  % \allowdisplaybreaks{}
+
+  % Makes a lot of things blue, avoid at all costs
+  % \everymath{\color{blue}}
+
+  % Table of contents section text
+  \AtBeginDocument{\renewcommand*\contentsname{Περιεχόμενα}}
+
+  % References section text
+  \AtBeginDocument{\renewcommand*\refname{Βιβλιογραφία}}
+
+  % Numbering format
+  % {equation}{section} means <section number>.<equation number>
+  % {equation}{subsection} means <section number>.<subsection number>.<equation number>
+  % \numberwithin{equation}{section}
+
+  \hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    linkcolor=black,
+    citecolor=red
+  }
+
+  \pagestyle{fancy}
+  \renewcommand{\headrulewidth}{0.3pt}
+  \renewcommand{\footrulewidth}{0.3pt}
+  
+\setlength{\headsep}{40pt}
+  \fancyhead{}
+  \fancyhead[L]{
+    \begin{tabular}{rl}
+      \begin{picture}(25,15)(0,0)
+        \put(0,-8){\includegraphics[width=8mm,height=8mm]{graphics/ceid.png}}
+      \end{picture}
+      \begin{tabular}{l}
+        \textbf{\bf \ttfamily Πανεπιστήμιο Πατρών} \\
+        \textbf{\bf \ttfamily Τμήμα Μηχανικών Ηλεκτρονικών Υπολογιστών και Πληροφορικής}
+      \end{tabular}
+    \end{tabular}
+  }
+  \fancyhead[R]{
+    \begin{tabular}{l}
+      \tiny \bf \\
+      \tiny \bf
+    \end{tabular}
+  }
+
+  \fancyfoot{}
+  \fancyfoot[L]{\scriptsize \ttfamily \@coursename}
+  \fancyfoot[R]{\scriptsize \ttfamily Σελίδα {\thepage}/\pageref{LastPage}}
+}
+
+\def\coverpage{
+  \thispagestyle{empty}
+
+  \begin{center}
+    ΠΑΝΕΠΙΣΤΗΜΙΟ ΠΑΤΡΩΝ
+
+
+    \MakeUppercase{\@deptname}
+    \\[5\baselineskip]
+    \includegraphics[width=0.4\textwidth]{graphics/img.png}
+    \\[3\baselineskip]
+    \begin{tabular}{c}
+      \textbf{\Large \@coursename}                        \\
+      {}                                                  \\
+      \midrule                                            \\
+      \textbf{\Large \@reporttype}                        \\
+      {}                                                  \\
+      \textbf{\Huge \parbox[c]{16cm}{\centering \@title}} \\
+      {}                                                  \\
+      \bottomrule
+    \end{tabular}
+   % \vfill%
+    \begin{tabular}{rll}
+      Καθηγητές: & \@advisor &    \\
+      % Student: & Name      & ID \\
+    \end{tabular}
+ \\[4\baselineskip]
+
+%\section*{Λίστα Ομάδας}
+\begin{center}
+  \begin{tabular}{cccc}
+    \toprule
+    \multicolumn{1}{c}{\textbf{ΑΜ}} & \textbf{Επώνυμο} & \textbf{Όνομα} & \textbf{Έτος} \\
+    \midrule
+        1084567 & Βιλλιώτης & Αχιλλέας           & 3\[^o\] \\
+        1088098 & Μπαρδάκης & Βασίλειος          & 3\[^o\] \\
+        1090073 & Πλάτωνας & Θεόδωρος            & 3\[^o\] \\
+        1084589 & Χάλλας & Χαράλαμπος-Μάριος     & 3\[^o\] \\
+        
+        
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+
+     \\[6\baselineskip]
+    \MakeUppercase{\@reportplace, \@reporttime}
+  \end{center}
+
+  \clearpage
+}
