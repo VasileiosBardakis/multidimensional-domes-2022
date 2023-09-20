@@ -1,18 +1,20 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <math.h>
 using namespace std;
 using Point = pair<float,float>;
 
-void readPoints(const vector<Point> points) {
+//reference instead of value for performance
+void readPoints(const vector<Point>& points) {
     cout << "Reading points..." << endl;
     for (const auto& point: points) {
-        cout << point.first << " " << point.second << endl;
+        cout << setprecision(6) << point.first << " " << setprecision(6) << point.second << endl;
     }
     cout << endl;
 }
 
-int orientation(Point p, Point q, Point r) {
+int orientation(Point &p, Point &q, Point &r) {
     /*
     Given a vector of points, calculate orientation of top 3
     Orientation of p, q, r
@@ -20,7 +22,6 @@ int orientation(Point p, Point q, Point r) {
     1: clockwise
     2: counter-clockwise
     */
-    //TODO: In point_2d terms
     cout << "Calculating slope for: " << endl;
     cout << p.first << " " << p.second << endl; 
     cout << q.first << " " << q.second << endl; 
@@ -29,10 +30,15 @@ int orientation(Point p, Point q, Point r) {
     float slope = (q.second - p.second) * (r.first - q.first)
               - (q.first - p.first) * (r.second - q.second);
 
-    cout << "Slope: " << slope << endl << endl;
-    if (slope == 0)
-    return 0; // collinear
- 
+    cout << "Slope: " << slope;
+    
+    //epsilon value
+    if (fabs(slope) < 1e-6) {
+        cout << " colinear" << endl << endl;
+        return 0; // collinear
+    }
+    
+    cout << " not colinear" << endl << endl;
     return (slope > 0) ? 1 : 2; // clock or counter-clock wise
     /*
     https://www.geeksforgeeks.org/orientation-3-ordered-points/
@@ -46,23 +52,14 @@ int orientation(Point p, Point q, Point r) {
     */
 }
 
-bool onSegment(Point p, Point q) {
-    /*
-    true:   
-    false:
-    */
-}
-
-bool doesIntersect(Point p, Point q) {
-    /*
-    Using x and y members of p and q,
-    true:   intersect
-    false:  not intersect
-    */
-}
-
 bool compare_x(Point p, Point q) {
+    if (p.first == q.first) 
+        return (p.second > q.second);
     return (p.first < q.first);
+}
+
+bool compare_y(Point p, Point q) {
+    return (p.second < q.second);
 }
 
 void convex_hull(vector<Point> &points, vector<Point> &result) {
@@ -84,31 +81,53 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     if clockwise continue
     TODO: colinear?
     */
-    vector<Point> lstack;
     readPoints(points);
+
     for (const auto& point: points) {
-        lstack.push_back(point);
-        readPoints(lstack);
+        result.push_back(point);
+        readPoints(result);
 
         //Can't compute orientation with 2 elements
+        /*
         if (point == points.begin()[0] || point == points.begin()[1]) {
-            /*
-            TODO: Possibility of two identical points messing this up?
-            cout << endl;
-            cout << point.first << " " << point.second << " entered continue" << endl;
-            */
+            //TODO: Possibility of two identical points messing this up?
+            //cout << endl;
+            //cout << point.first << " " << point.second << " entered continue" << endl;
             continue;
-
         }
+        */
 
         //???: if (stack.size() >= 3)
         //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
-        while(orientation(lstack[lstack.size()-3], lstack[lstack.size()-2], lstack[lstack.size()-1]) == 2 && lstack.size() >= 3)
-            lstack.erase(lstack.end()-2);
+        /*
+        while(orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]) == 2 && result.size() >= 3)
+            result.erase(result.end()-2);
+        }
+        */
+        while(result.size() >= 3) {
+            int orientationValue = orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]);
+            switch (orientationValue) {
+                case 0: //colinear
+                    //find tallest and remove the rest
+                    //sort a subset based on y coordinate
+                    sort(result.end()-3, result.end()-1, compare_y);
+                    result.erase(result.end()-3, result.end()-2);
+                    break;
+
+                case 1: //clock
+                    break;
+
+                case 2: //counterclock
+                    result.erase(result.end()-2);
+                    break;
+            }
+            if (orientationValue != 2)
+                break;
+        }
     }
 
     cout << "lstack" << endl;
-    readPoints(lstack);
+    readPoints(result);
 
     /*
     Right to left scan:
@@ -117,28 +136,63 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     */
     //https://stackoverflow.com/questions/8542591/c11-reverse-range-based-for-loop
     vector<Point> rstack;
+    cout << "reverse:" << endl;
+
     //Iterating in reverse using a for loop and auto
     for (auto rit = points.rbegin(); rit != points.rend(); ++rit) {
 
         rstack.push_back(*rit);
 
         //Can't compute orientation with 2 elements
-        //TODO: Replace with end()
         //???: Difference between begin(), end() etc.
+        //TODO: MIGHT NOT BE NEEDED!
+        /*
         if (*rit == *(points.end()-2) || *rit == *(points.end())) 
             continue;
+        */
 
         //???: if (stack.size() >= 3)
         //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
+        /*
         while(orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]) == 2 && rstack.size() >= 3)
             rstack.erase(rstack.end()-2);
+       while(rstack.size() >= 3) {
+            if (orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]) == 2)
+                rstack.erase(rstack.end()-2);
+            else break;
+        }
+        */
+        while(rstack.size() >= 3) {
+            int orientationValue = orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]);
+            switch (orientationValue) {
+                case 0: //colinear
+                    //find shortest and remove the rest
+                    //sort a subset based on y coordinate
+                    sort(rstack.end()-3, rstack.end()-1, compare_y);
+                    rstack.erase(rstack.end()-2, rstack.end()-1);
+                    break;
+
+                case 1: //clock
+                    break;
+
+                case 2: //counterclock
+                    rstack.erase(rstack.end()-2);
+                    break;
+            }
+            if (orientationValue != 2)
+                break;
+        }
     }
 
     cout << "rstack" << endl;
     readPoints(rstack);
 
     //Reduce
-
-
-
+    //inefficient
+    //https://cplusplus.com/reference/vector/vector/insert/
+    //result becomes lstack and rstack inserted to its end
+    //cut first and last because they are identical
+    result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
+    cout << "Combining result..." << endl;
+    readPoints(result);
 }
