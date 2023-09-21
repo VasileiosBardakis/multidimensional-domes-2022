@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
+#include <iomanip>
 using namespace std;
 using Point = pair<float,float>;
 
@@ -136,7 +137,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     */
     //https://stackoverflow.com/questions/8542591/c11-reverse-range-based-for-loop
     vector<Point> rstack;
-    cout << "reverse:" << endl;
+    cout << "reverse:................................................" << endl;
 
     //Iterating in reverse using a for loop and auto
     for (auto rit = points.rbegin(); rit != points.rend(); ++rit) {
