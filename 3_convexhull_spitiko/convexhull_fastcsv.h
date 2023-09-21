@@ -23,23 +23,25 @@ int orientation(Point &p, Point &q, Point &r) {
     1: clockwise
     2: counter-clockwise
     */
-    cout << "Calculating slope for: " << endl;
-    cout << p.first << " " << p.second << endl; 
-    cout << q.first << " " << q.second << endl; 
-    cout << r.first << " " << r.second << endl; 
+    //cout << "Calculating slope for: " << endl;
+    //cout << p.first << " " << p.second << endl; 
+    //cout << q.first << " " << q.second << endl; 
+    //cout << r.first << " " << r.second << endl; 
 
     float slope = (q.second - p.second) * (r.first - q.first)
               - (q.first - p.first) * (r.second - q.second);
 
-    cout << "Slope: " << slope;
+    //cout << "Slope: " << slope;
     
     //epsilon value
     if (fabs(slope) < 1e-6) {
-        cout << " colinear" << endl << endl;
+        if (slope!=0)
+            cout << "near 0 slope found: " << slope << endl;
+        //cout << " colinear" << endl << endl;
         return 0; // collinear
     }
     
-    cout << " not colinear" << endl << endl;
+    //cout << " not colinear" << endl << endl;
     return (slope > 0) ? 1 : 2; // clock or counter-clock wise
     /*
     https://www.geeksforgeeks.org/orientation-3-ordered-points/
@@ -82,11 +84,11 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     if clockwise continue
     TODO: colinear?
     */
-    readPoints(points);
+    //readPoints(points);
 
     for (const auto& point: points) {
         result.push_back(point);
-        readPoints(result);
+        //readPoints(result);
 
         //Can't compute orientation with 2 elements
         /*
@@ -128,7 +130,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     }
 
     cout << "lstack" << endl;
-    readPoints(result);
+    //readPoints(result);
 
     /*
     Right to left scan:
@@ -186,7 +188,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     }
 
     cout << "rstack" << endl;
-    readPoints(rstack);
+    //readPoints(rstack);
 
     //Reduce
     //inefficient
@@ -195,5 +197,5 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     //cut first and last because they are identical
     result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     cout << "Combining result..." << endl;
-    readPoints(result);
+    //readPoints(result);
 }
