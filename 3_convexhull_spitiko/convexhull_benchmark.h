@@ -190,7 +190,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     //https://cplusplus.com/reference/vector/vector/insert/
     //result becomes lstack and rstack inserted to its end
     //cut first and last because they are identical
-    result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     //cout << "Reducing..." << endl;
+    result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     //readPoints(result);
 }

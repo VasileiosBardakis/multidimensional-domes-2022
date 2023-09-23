@@ -34,10 +34,10 @@ int main()
 
     /** Benchmarking **/
     int i = 1;
-    for (i = 1; i < 7; i++) {
+    for (i = 1; i < 8; i++) {
         //https://stackoverflow.com/questions/421573/best-way-to-extract-a-subvector-from-a-vector
         vector<Point>::const_iterator first = points.begin();
-        vector<Point>::const_iterator last = points.begin() + pow(10,i);
+        vector<Point>::const_iterator last = points.begin() + 3 * pow(10,i);
         vector<Point> newVec(first, last);
 
         auto duration = chrono::milliseconds::zero();
@@ -60,7 +60,7 @@ int main()
     }
     // last subset benchmarked
     vector<Point>::const_iterator first = points.begin();
-    vector<Point>::const_iterator last = points.begin() + pow(10,i-1);
+    vector<Point>::const_iterator last = points.begin() + 3 * pow(10,i-1);
     vector<Point> newVec(first, last);
 
     cout << "Writing points.csv..." << endl;

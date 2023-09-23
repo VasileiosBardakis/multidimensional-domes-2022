@@ -41,9 +41,10 @@ int main()
             current_points++;
         }
 
+    cout.precision(5);
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
-    cout << "Parsing took: " << duration.count() << setprecision(5) << "ms." << endl;
+    cout << "Parsing took: " << duration.count() << "ms." << endl;
 
     start = high_resolution_clock::now();
     
@@ -52,7 +53,7 @@ int main()
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start);
     auto duration_in_micro = duration_cast<microseconds>(stop - start);
-    cout << "Convex hull took: " << duration.count() << setprecision(5) << "ms or " << duration_in_micro.count() << "us." << endl;
+    cout << "Convex hull took: " << duration.count() << "ms or " << duration_in_micro.count() << "us." << endl;
     cout << points.size() << " points on the dataset" << endl;
     cout << result.size() << " points on the convex hull" << endl;
     

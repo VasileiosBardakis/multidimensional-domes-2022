@@ -35,14 +35,12 @@ int orientation(Point &p, Point &q, Point &r) {
     
     //epsilon value
     // decreasing epsilon makes more artifacts appear
-    if (fabs(slope) < 1e-6) {
+    if (fabs(slope) < 1e-8) {
         if (slope!=0)
             cout << "near 0 slope found: " << slope << endl;
-        //cout << " colinear" << endl << endl;
         return 0; // collinear
     }
     
-    //cout << " not colinear" << endl << endl;
     return (slope > 0) ? 1 : 2; // clock or counter-clock wise
     /*
     https://www.geeksforgeeks.org/orientation-3-ordered-points/
@@ -195,7 +193,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     //https://cplusplus.com/reference/vector/vector/insert/
     //result becomes lstack and rstack inserted to its end
     //cut first and last because they are identical
-    result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     cout << "Reducing..." << endl;
+    result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     //readPoints(result);
 }

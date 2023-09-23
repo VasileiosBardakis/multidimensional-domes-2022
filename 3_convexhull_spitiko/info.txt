@@ -1,0 +1,2 @@
+g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 (C++ 17 default?)
+Python 3.11.4
