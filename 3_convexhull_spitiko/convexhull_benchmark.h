@@ -4,7 +4,7 @@
 #include <math.h>
 #include <iomanip>
 using namespace std;
-using Point = pair<float,float>;
+using Point = pair<double,double>;
 
 //reference instead of value for performance
 void readPoints(const vector<Point>& points) {
@@ -28,21 +28,19 @@ int orientation(Point &p, Point &q, Point &r) {
     //cout << q.first << " " << q.second << endl; 
     //cout << r.first << " " << r.second << endl; 
 
-    float slope = (q.second - p.second) * (r.first - q.first)
+    double slope = (q.second - p.second) * (r.first - q.first)
               - (q.first - p.first) * (r.second - q.second);
 
     //cout << "Slope: " << slope;
     
     //epsilon value
-    if (fabs(slope) < 1e-6) {
+    if (fabs(slope) < 1e-8) {
         if (slope!=0)
-            cout << "near 0 slope found: " << slope << endl;
-        //cout << " colinear" << endl << endl;
+            //cout << "near 0 slope found: " << slope << endl;
         return 0; // collinear
     }
     
-    //cout << " not colinear" << endl << endl;
-    return (slope > 0) ? 1 : 2; // clock or counter-clock wise
+    return (slope > 0) ? 1 : 2;
     /*
     https://www.geeksforgeeks.org/orientation-3-ordered-points/
     int slope = (p2.y - p1.y) * (p3.x - p2.x)
@@ -72,9 +70,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     stores it in lstack, rstack
     and combines in result
     */
-   
-
-    //Sort based on x-coordinate
+    // Sort based on x-coordinate
     sort(points.begin(), points.end(), compare_x);
 
     /*
@@ -100,7 +96,6 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
         }
         */
 
-        //???: if (stack.size() >= 3)
         //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
         /*
         while(orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]) == 2 && result.size() >= 3)
@@ -129,7 +124,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
         }
     }
 
-    cout << "lstack" << endl;
+    //cout << "Left to right finished." << endl;
     //readPoints(result);
 
     /*
@@ -139,7 +134,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     */
     //https://stackoverflow.com/questions/8542591/c11-reverse-range-based-for-loop
     vector<Point> rstack;
-    cout << "reverse:................................................" << endl;
+    //cout << "Right to left starting..." << endl;
 
     //Iterating in reverse using a for loop and auto
     for (auto rit = points.rbegin(); rit != points.rend(); ++rit) {
@@ -187,7 +182,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
         }
     }
 
-    cout << "rstack" << endl;
+    //cout << "Right to left finished." << endl;
     //readPoints(rstack);
 
     //Reduce
@@ -196,6 +191,6 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     //result becomes lstack and rstack inserted to its end
     //cut first and last because they are identical
     result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
-    cout << "Combining result..." << endl;
+    //cout << "Reducing..." << endl;
     //readPoints(result);
 }
