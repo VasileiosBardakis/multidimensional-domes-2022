@@ -27,12 +27,12 @@ ofstream ofsQueryMatches("results/queryMatches_e7.csv");
 ofstream ofsQueryTime("results/queryTime_e7.csv");
 #endif
 
-struct Interval {
-    int64_t start;
-    int64_t end;
+    struct Interval {
+        int64_t start;
+        int64_t end;
 
-    Interval(int64_t start, ino64_t end) : start(start), end(end) {}
-};
+        Interval(int64_t start, int64_t end) : start(start), end(end) {}
+    };
 
 // Basic building block for making the segment tree
 struct Node {
@@ -70,6 +70,34 @@ int insertInterval(Node* node, Interval interval){
 }
 
 //TODO: Delete interval.
+int deleteInterval(Node* node, Interval interval){
+    int64_t start = interval.start;
+    int64_t end = interval.end;
+
+    if (start <= node->left && end >= node->right) {
+        auto it = std::find(node->intervals.begin(), node->intervals.end(), interval);
+
+        // Check if the Interval was found
+        if (it != node->intervals.end()) {
+            // Erase the Interval from the vector
+            node->intervals.erase(it);
+            return 0; //Interval spans node range
+        } 
+    } else {
+        int64_t avg = (node->left + node->right)/2;
+
+        if(start < avg){
+            // Check child if it exists
+            if (node->leftChild){ deleteInterval(node->leftChild, interval);}
+        }
+
+        if (end > avg){
+            // Check child if it exists
+            if (node->rightChild){ deleteInterval(node->rightChild, interval);}
+        }
+    }
+    return 0;
+}
 
 // Interval should be in the format of [x, x+1] strictly!
 int stabQuery(Node* node, Interval interval){
