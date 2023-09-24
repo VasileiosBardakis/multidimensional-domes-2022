@@ -80,7 +80,7 @@ int deleteInterval(Node* node, Interval interval){
         // Check if the Interval was found
         if (it != node->intervals.end()) {
             // Erase the Interval from the vector
-            node->intervals.erase(it);
+            node->intervals.erase(it); // TODO: Can iterator find object with same values but different address?
             return 0; //Interval spans node range
         } 
     } else {
@@ -88,6 +88,8 @@ int deleteInterval(Node* node, Interval interval){
 
         if(start < avg){
             // Check child if it exists
+            //TODO: check if deletes last interval, return specific int 
+            // to signal parent to delete node
             if (node->leftChild){ deleteInterval(node->leftChild, interval);}
         }
 
