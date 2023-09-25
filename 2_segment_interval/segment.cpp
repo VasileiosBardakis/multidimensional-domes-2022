@@ -4,35 +4,36 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 using namespace std::chrono;
 
-#define MINVAL int64_t(-3.6e7)
-#define MAXVAL int64_t(3.6e7)
-#define NUMOFINTERVALS 1e6
+#define MINVAL int64_t(-3.6e3)
+#define MAXVAL int64_t(3.6e3)
+#define NUMOFINTERVALS 1e2
 
 #define OUTPUT_QUERY_RESULTS true
 
 // Set to true to output run time of insert and query to output file
 #define TEST_INSERT_RUNTIME false
-#define TEST_QUERY_RUNTIME false
+#define TEST_QUERY_RUNTIME true
 
 #if TEST_INSERT_RUNTIME
-ofstream ofsInsert("results/insertionTime_e7.csv");
+ofstream ofsInsert("resultsSegment/insertionTime.csv");
 #endif
 
 #if TEST_QUERY_RUNTIME
-ofstream ofsQueryMatches("results/queryMatches_e7.csv");
-ofstream ofsQueryTime("results/queryTime_e7.csv");
+ofstream ofsQueryMatches("resultsSegment/queryMatches.csv");
+ofstream ofsQueryTime("resultsSegment/queryTime.csv");
 #endif
 
-    struct Interval {
-        int64_t start;
-        int64_t end;
+struct Interval {
+    int64_t start;
+    int64_t end;
 
-        Interval(int64_t start, int64_t end) : start(start), end(end) {}
-    };
+    Interval(int64_t start, int64_t end) : start(start), end(end) {}
+};
 
 // Basic building block for making the segment tree
 struct Node {
@@ -69,20 +70,35 @@ int insertInterval(Node* node, Interval interval){
     return 0;
 }
 
-//TODO: Delete interval.
 int deleteInterval(Node* node, Interval interval){
     int64_t start = interval.start;
     int64_t end = interval.end;
 
     if (start <= node->left && end >= node->right) {
-        auto it = std::find(node->intervals.begin(), node->intervals.end(), interval);
-
+        /*
+        auto it = find_if(node->intervals.begin(), node->intervals.end(), isEqualInterval);
+        
         // Check if the Interval was found
         if (it != node->intervals.end()) {
             // Erase the Interval from the vector
             node->intervals.erase(it); // TODO: Can iterator find object with same values but different address?
             return 0; //Interval spans node range
-        } 
+        */
+
+        for (auto it = node->intervals.begin(); it != node->intervals.end(); /* no increment here */) {
+        if (start == it->start && end == it->end) {
+            it = node->intervals.erase(it); // Stops the for loop if the element is found (singular)
+
+            if (node->intervals.size() == 0) { 
+                // No intervals in node, so node is useless.
+                // Call parent node to delete this
+                return 1;
+            }
+        } else {
+            ++it; // Move to the next element
+        }
+    }
+
     } else {
         int64_t avg = (node->left + node->right)/2;
 
@@ -90,12 +106,22 @@ int deleteInterval(Node* node, Interval interval){
             // Check child if it exists
             //TODO: check if deletes last interval, return specific int 
             // to signal parent to delete node
-            if (node->leftChild){ deleteInterval(node->leftChild, interval);}
+            if (node->leftChild){
+                int returnCode = deleteInterval(node->leftChild, interval);
+                if (returnCode == 1) {
+                    delete node->leftChild;
+                }
+            }
         }
 
         if (end > avg){
             // Check child if it exists
-            if (node->rightChild){ deleteInterval(node->rightChild, interval);}
+            if (node->rightChild){
+                int returnCode = deleteInterval(node->rightChild, interval);
+                if (returnCode == 1) {
+                    delete node->leftChild;
+                }
+            }
         }
     }
     return 0;
@@ -113,29 +139,29 @@ int stabQuery(Node* node, Interval interval){
     }
 
     if(start < avg){
-        // Stop searching if no other node exists
-        if (!node->leftChild){ return 0;}
-        stabQuery(node->leftChild, interval);
-
 #if OUTPUT_QUERY_RESULTS
+        // Print all overlapping intervals
         for (int i=0; i<node->intervals.size(); i++){ 
             cout << "[" << node->intervals[i].start << ", " << node->intervals[i].end << "], ";
         }
 #endif
+        // Stop searching if no other node exists
+        if (!node->leftChild){ return 0;}
+        stabQuery(node->leftChild, interval);
 
 #if TEST_QUERY_RUNTIME
         ofsQueryMatches << node->intervals.size() << "+";
 #endif
     } else if (end > avg){
-        // Stop searching if no other node exists
-        if (!node->rightChild){ return 0;}
-        stabQuery(node->rightChild, interval);
-
 #if OUTPUT_QUERY_RESULTS
+        // Print all overlapping intervals
         for (int i=0; i<node->intervals.size(); i++){ 
             cout << "[" << node->intervals[i].start << ", " << node->intervals[i].end << "], ";
         }
 #endif
+        // Stop searching if no other node exists
+        if (!node->rightChild){ return 0;}
+        stabQuery(node->rightChild, interval);
 
 #if TEST_QUERY_RUNTIME
         ofsQueryMatches << node->intervals.size() << "+";
@@ -166,7 +192,7 @@ void generateIntervals(vector<Interval> &intervals, int64_t left, int64_t right,
 }
 
 // Generated intervals to be used for queries
-void generateQueryIntervals(vector<Interval> &intervals, int64_t left, int64_t right, int64_t numIntervals){
+void generateUnitIntervals(vector<Interval> &intervals, int64_t left, int64_t right, int64_t numIntervals){
     for (int i=0; i<numIntervals; i++){
         int64_t start = rand() % (right - left) + left;
         int64_t end = start + 1;
@@ -195,11 +221,12 @@ int main(){
 
 #if TEST_QUERY_RUNTIME
     vector<Interval> queryIntervals;
-    generateQueryIntervals(queryIntervals, MINVAL, MAXVAL, NUMOFINTERVALS);
+    generateUnitIntervals(queryIntervals, MINVAL, MAXVAL, 5);
     for (Interval interval : queryIntervals){
         auto startTimeQuery = high_resolution_clock::now();
 
         stabQuery(root, interval);
+        cout << "\n\n";
 
         auto stopTimeQuery = high_resolution_clock::now();
         auto durationQuery = duration_cast<microseconds>(stopTimeQuery - startTimeQuery);
