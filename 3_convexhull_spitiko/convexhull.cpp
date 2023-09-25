@@ -11,6 +11,8 @@
 using namespace std;
 using namespace std::chrono;
 
+#define CSV_EXPORT true
+
 int main()
 {
     /*
@@ -32,7 +34,7 @@ int main()
 
     io::CSVReader<3> in("airbnb_listings_usa.csv");
     in.read_header(io::ignore_extra_column, "latitude", "longitude", "price");
-    float latitude; float longitude; int price;
+    double latitude; double longitude; int price;
     while (in.read_row(latitude, longitude, price))
         {
             //TODO: Is this check worse than culling after with vector functions?
@@ -57,6 +59,8 @@ int main()
     cout << points.size() << " points on the dataset" << endl;
     cout << result.size() << " points on the convex hull" << endl;
     
+
+#if CSV_EXPORT
     cout << "Writing points.csv..." << endl;
     ofstream pointsFile;
     pointsFile.open("points.csv");
@@ -72,6 +76,6 @@ int main()
         convexFile << p.first << "," << p.second << "\n";
     }
     convexFile.close();
-
+#endif
     return 0;
 }

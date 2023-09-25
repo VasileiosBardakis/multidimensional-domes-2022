@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <math.h>
 #include <iomanip>
+
 using namespace std;
 using Point = pair<double,double>;
+
+#define SLOPE_EPSILON 1e-8
 
 //reference instead of value for performance
 void readPoints(const vector<Point>& points) {
@@ -34,9 +37,7 @@ int orientation(Point &p, Point &q, Point &r) {
     //cout << "Slope: " << slope;
     
     //epsilon value
-    if (fabs(slope) < 1e-8) {
-        if (slope!=0)
-            //cout << "near 0 slope found: " << slope << endl;
+    if (fabs(slope) < SLOPE_EPSILON) {
         return 0; // collinear
     }
     
@@ -70,6 +71,7 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     stores it in lstack, rstack
     and combines in result
     */
+
     // Sort based on x-coordinate
     sort(points.begin(), points.end(), compare_x);
 
@@ -78,7 +80,6 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     For each point added, check orientation
     if counter-clockwise call pop (recursive)
     if clockwise continue
-    TODO: colinear?
     */
     //readPoints(points);
 
@@ -86,36 +87,23 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
         result.push_back(point);
         //readPoints(result);
 
-        //Can't compute orientation with 2 elements
-        /*
-        if (point == points.begin()[0] || point == points.begin()[1]) {
-            //TODO: Possibility of two identical points messing this up?
-            //cout << endl;
-            //cout << point.first << " " << point.second << " entered continue" << endl;
-            continue;
-        }
-        */
+        // Can't compute orientation with 2 elements
+        // While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
 
-        //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
-        /*
-        while(orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]) == 2 && result.size() >= 3)
-            result.erase(result.end()-2);
-        }
-        */
         while(result.size() >= 3) {
             int orientationValue = orientation(result[result.size()-3], result[result.size()-2], result[result.size()-1]);
             switch (orientationValue) {
-                case 0: //colinear
-                    //find tallest and remove the rest
-                    //sort a subset based on y coordinate
+                case 0: // colinear
+                    // find tallest and remove the rest
+                    // sort a subset based on y coordinate
                     sort(result.end()-3, result.end()-1, compare_y);
                     result.erase(result.end()-3, result.end()-2);
                     break;
 
-                case 1: //clock
+                case 1: // clock
                     break;
 
-                case 2: //counterclock
+                case 2: // counterclock
                     result.erase(result.end()-2);
                     break;
             }
@@ -141,39 +129,28 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
 
         rstack.push_back(*rit);
 
-        //Can't compute orientation with 2 elements
-        //???: Difference between begin(), end() etc.
-        //TODO: MIGHT NOT BE NEEDED!
+        // Can't compute orientation with 2 elements
+        // MIGHT NOT BE NEEDED!
         /*
         if (*rit == *(points.end()-2) || *rit == *(points.end())) 
             continue;
         */
 
-        //???: if (stack.size() >= 3)
         //While orientation of last 3 is counter clockwise, keep subtracting middle element from the convex hull stack.
-        /*
-        while(orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]) == 2 && rstack.size() >= 3)
-            rstack.erase(rstack.end()-2);
-       while(rstack.size() >= 3) {
-            if (orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]) == 2)
-                rstack.erase(rstack.end()-2);
-            else break;
-        }
-        */
         while(rstack.size() >= 3) {
             int orientationValue = orientation(rstack[rstack.size()-3], rstack[rstack.size()-2], rstack[rstack.size()-1]);
             switch (orientationValue) {
-                case 0: //colinear
-                    //find shortest and remove the rest
-                    //sort a subset based on y coordinate
+                case 0: // colinear
+                    // find shortest and remove the rest
+                    // sort a subset based on y coordinate
                     sort(rstack.end()-3, rstack.end()-1, compare_y);
                     rstack.erase(rstack.end()-2, rstack.end()-1);
                     break;
 
-                case 1: //clock
+                case 1: // clock
                     break;
 
-                case 2: //counterclock
+                case 2: // counterclock
                     rstack.erase(rstack.end()-2);
                     break;
             }
@@ -186,10 +163,9 @@ void convex_hull(vector<Point> &points, vector<Point> &result) {
     //readPoints(rstack);
 
     //Reduce
-    //inefficient
-    //https://cplusplus.com/reference/vector/vector/insert/
-    //result becomes lstack and rstack inserted to its end
-    //cut first and last because they are identical
+    // Inefficient https://cplusplus.com/reference/vector/vector/insert/
+    // Result is lstack and rstack is inserted to its end 
+    // (Without first and last because they are identical)
     //cout << "Reducing..." << endl;
     result.insert(result.end(), rstack.begin()+1, rstack.end()-1);
     //readPoints(result);

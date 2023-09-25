@@ -12,6 +12,9 @@
 using namespace std;
 using namespace std::chrono;
 
+#define CSV_EXPORT true
+#define MAXNUM 6
+
 int main()
 {
     /*
@@ -34,7 +37,7 @@ int main()
 
     /** Benchmarking **/
     int i = 1;
-    for (i = 1; i < 8; i++) {
+    for (i = 1; i < MAXNUM; i++) {
         //https://stackoverflow.com/questions/421573/best-way-to-extract-a-subvector-from-a-vector
         vector<Point>::const_iterator first = points.begin();
         vector<Point>::const_iterator last = points.begin() + 3 * pow(10,i);
@@ -62,7 +65,7 @@ int main()
     vector<Point>::const_iterator first = points.begin();
     vector<Point>::const_iterator last = points.begin() + 3 * pow(10,i-1);
     vector<Point> newVec(first, last);
-
+#if CSV_EXPORT
     cout << "Writing points.csv..." << endl;
     ofstream pointsFile;
     pointsFile.open("points.csv");
@@ -79,6 +82,6 @@ int main()
         convexFile << p.first << "," << p.second << "\n";
     }
     convexFile.close();
-
+#endif
     return 0;
 }
