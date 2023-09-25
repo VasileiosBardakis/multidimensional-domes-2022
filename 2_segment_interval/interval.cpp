@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 
 using namespace std;
 using namespace std::chrono;
@@ -36,7 +37,7 @@ struct Interval {
     int64_t start;
     int64_t end;
 
-    Interval(int64_t start, ino64_t end) : start(start), end(end) {}
+    Interval(int64_t start, int64_t end) : start(start), end(end) {}
 };
 
 // Comparator logic for intervals
@@ -298,6 +299,7 @@ void generateIntervals(vector<Interval> &intervals, int64_t left, int64_t right,
 }
 
 int main(){
+    srand(time(0));
     vector<Interval> intervals;
     generateIntervals(intervals, MINVAL, MAXVAL, NUMOFINTERVALS);
     Node *root = nullptr;
@@ -320,6 +322,7 @@ int main(){
     for (Interval queryInterval : queryIntervals){
         auto startTimeQuery = high_resolution_clock::now();
 
+        cout << "Search query for [" << queryInterval.start << ", " << queryInterval.end << "]: ";
         searchInterval(root, queryInterval);
         cout << "\n\n";
         
@@ -334,6 +337,7 @@ int main(){
         int64_t randDelIndex = rand() % intervals.size();
         auto startTimeDelete = high_resolution_clock::now();
 
+        cout << "Deletion of interval: [" << intervals[randDelIndex].start << ", " << intervals[randDelIndex].end << "]:\n";
         root = deleteInterval(root, intervals[randDelIndex]);
 
         auto stoptimeDelete = high_resolution_clock::now();
