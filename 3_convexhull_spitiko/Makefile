@@ -19,4 +19,4 @@ cleanBenchmark:
 cleanCSV:
 	rm -f convex.csv points.csv
 
-clean: cleanConvex cleanBenchmark
+clean: cleanConvex cleanBenchmark cleanCSV
