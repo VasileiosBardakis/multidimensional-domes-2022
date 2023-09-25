@@ -31,7 +31,7 @@ struct Interval {
     int64_t start;
     int64_t end;
 
-    Interval(int64_t start, ino64_t end) : start(start), end(end) {}
+    Interval(int64_t start, int64_t end) : start(start), end(end) {}
 };
 
 // Basic building block for making the segment tree
