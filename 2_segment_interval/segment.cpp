@@ -12,13 +12,14 @@ using namespace std::chrono;
 
 #define MINVAL int64_t(-3.6e3)
 #define MAXVAL int64_t(3.6e3)
-#define NUMOFINTERVALS 2
+#define NUMOFINTERVALS 10
 
 #define OUTPUT_QUERY_RESULTS true
 
 // Set to true to output run time of insert and query to output file
 #define TEST_INSERT_RUNTIME false
 #define TEST_QUERY_RUNTIME true
+#define TEST_DELETE_RUNTIME true
 
 #if TEST_INSERT_RUNTIME
 ofstream ofsInsert("resultsSegment/insertionTime.csv");
@@ -27,6 +28,10 @@ ofstream ofsInsert("resultsSegment/insertionTime.csv");
 #if TEST_QUERY_RUNTIME
 ofstream ofsQueryMatches("resultsSegment/queryMatches.csv");
 ofstream ofsQueryTime("resultsSegment/queryTime.csv");
+#endif
+
+#if TEST_DELETE_RUNTIME
+ofstream ofsDelete("resultsSegment/deletionTime.csv");
 #endif
 
 struct Interval {
@@ -110,6 +115,7 @@ int deleteInterval(Node* node, Interval interval){
                 int returnCode = deleteInterval(node->leftChild, interval);
                 if (returnCode == 1) {
                     delete node->leftChild;
+                    node->leftChild = nullptr;
                 }
             }
         }
@@ -120,6 +126,7 @@ int deleteInterval(Node* node, Interval interval){
                 int returnCode = deleteInterval(node->rightChild, interval);
                 if (returnCode == 1) {
                     delete node->rightChild;
+                    node->rightChild = nullptr;
                 }
             }
         }
@@ -240,9 +247,21 @@ int main(){
     printTree(root);
     std::cout << "\n";
 
-    cout << "Deletion of interval: [" << intervals[0].start << ", " << intervals[0].end << "]:\n";
-    deleteInterval(root, intervals[0]);
 
+    for (Interval interval : intervals){
+#if TEST_DELETE_RUNTIME
+        auto startTimeDelete = high_resolution_clock::now();
+#endif
+
+        cout << "Deletion of interval: [" << interval.start << ", " << interval.end << "]\n";
+        deleteInterval(root, interval);
+
+#if TEST_DELETE_RUNTIME
+        auto stopTimeDelete = high_resolution_clock::now();
+        auto durationDelete = duration_cast<microseconds>(stopTimeDelete - startTimeDelete);
+        ofsDelete << durationDelete.count() << "\n";
+#endif
+    }
     printTree(root);
 
 #if TEST_INSERT_RUNTIME
@@ -255,5 +274,10 @@ int main(){
     ofsQueryTime.close();
     ofsQueryMatches.flush();
     ofsQueryMatches.close();
+#endif
+
+#if TEST_DELETE_RUNTIME
+    ofsDelete.flush();
+    ofsDelete.close();
 #endif
 }
