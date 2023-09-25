@@ -1,6 +1,7 @@
 // Segment Tree implementation for interval queries
 // Utilizes an avl tree to store the intervals
 // Usage: compile with make, run with ./interval.out
+// Add folder "resultsInterval" to create the csv files.
 #include <chrono>
 #include <fstream>
 #include <iostream>
