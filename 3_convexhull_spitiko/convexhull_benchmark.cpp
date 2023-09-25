@@ -12,8 +12,8 @@
 using namespace std;
 using namespace std::chrono;
 
-#define CSV_EXPORT true
-#define MAXNUM 6
+#define CSV_EXPORT false
+#define MAXNUM 7
 
 int main()
 {
@@ -37,7 +37,7 @@ int main()
 
     /** Benchmarking **/
     int i = 1;
-    for (i = 1; i < MAXNUM; i++) {
+    for (i = 1; i <= MAXNUM; i++) {
         //https://stackoverflow.com/questions/421573/best-way-to-extract-a-subvector-from-a-vector
         vector<Point>::const_iterator first = points.begin();
         vector<Point>::const_iterator last = points.begin() + 3 * pow(10,i);
