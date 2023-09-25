@@ -1,5 +1,6 @@
 // Segment Tree implementation for stab queries
 // Usage: compile with make, run with ./segment.out
+// Add folder "resultsSegment" to create the csv files.
 #include <chrono>
 #include <fstream>
 #include <iostream>
