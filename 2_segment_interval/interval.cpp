@@ -14,6 +14,7 @@ using namespace std::chrono;
 #define MINVAL int64_t(-3.6e6)
 #define MAXVAL int64_t(3.6e6)
 #define NUMOFINTERVALS 1e2
+#define NUMOFDELETIONS 5
 
 #define OUTPUT_QUERY_RESULTS true
 
@@ -334,7 +335,7 @@ int main(){
 #endif
 
 #if TEST_DELETE_RUNTIME
-    for (int i=0; i<(1e2); i++){
+    for (int i=0; i<(NUMOFDELETIONS); i++){
         int64_t randDelIndex = rand() % intervals.size();
         auto startTimeDelete = high_resolution_clock::now();
 
