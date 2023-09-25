@@ -5,13 +5,14 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstdlib>
 
 using namespace std;
 using namespace std::chrono;
 
 #define MINVAL int64_t(-3.6e3)
 #define MAXVAL int64_t(3.6e3)
-#define NUMOFINTERVALS 1e2
+#define NUMOFINTERVALS 2
 
 #define OUTPUT_QUERY_RESULTS true
 
@@ -85,12 +86,13 @@ int deleteInterval(Node* node, Interval interval){
             return 0; //Interval spans node range
         */
 
+       //Find interval to delete
         for (auto it = node->intervals.begin(); it != node->intervals.end(); /* no increment here */) {
         if (start == it->start && end == it->end) {
             it = node->intervals.erase(it); // Stops the for loop if the element is found (singular)
 
-            if (node->intervals.size() == 0) { 
-                // No intervals in node, so node is useless.
+            if (node->intervals.size() == 0 && node->leftChild == nullptr && node->rightChild == nullptr) { 
+                // No intervals or children in node, so prune it.
                 // Call parent node to delete this
                 return 1;
             }
@@ -103,10 +105,8 @@ int deleteInterval(Node* node, Interval interval){
         int64_t avg = (node->left + node->right)/2;
 
         if(start < avg){
-            // Check child if it exists
-            //TODO: check if deletes last interval, return specific int 
-            // to signal parent to delete node
             if (node->leftChild){
+                // No intervals or children in node, so prune it.
                 int returnCode = deleteInterval(node->leftChild, interval);
                 if (returnCode == 1) {
                     delete node->leftChild;
@@ -115,11 +115,11 @@ int deleteInterval(Node* node, Interval interval){
         }
 
         if (end > avg){
-            // Check child if it exists
             if (node->rightChild){
+                // No intervals or children in node, so prune it.
                 int returnCode = deleteInterval(node->rightChild, interval);
                 if (returnCode == 1) {
-                    delete node->leftChild;
+                    delete node->rightChild;
                 }
             }
         }
@@ -201,6 +201,7 @@ void generateUnitIntervals(vector<Interval> &intervals, int64_t left, int64_t ri
 }
 
 int main(){
+    srand(time(0));
     vector<Interval> intervals;
     generateIntervals(intervals, MINVAL, MAXVAL, NUMOFINTERVALS);
     Node* root = new Node(MINVAL, MAXVAL);
@@ -223,8 +224,8 @@ int main(){
     vector<Interval> queryIntervals;
     generateUnitIntervals(queryIntervals, MINVAL, MAXVAL, 5);
     for (Interval interval : queryIntervals){
+        cout << "Stab query for [" << interval.start << ", " << interval.end << "]: ";
         auto startTimeQuery = high_resolution_clock::now();
-
         stabQuery(root, interval);
         cout << "\n\n";
 
@@ -234,9 +235,15 @@ int main(){
         ofsQueryMatches << "\n";
     }
 #endif
-
-    // printTree(root);
+    
+    cout << "With root: [" << root->left << ", " << root->right << "]:\n";
+    printTree(root);
     std::cout << "\n";
+
+    cout << "Deletion of interval: [" << intervals[0].start << ", " << intervals[0].end << "]:\n";
+    deleteInterval(root, intervals[0]);
+
+    printTree(root);
 
 #if TEST_INSERT_RUNTIME
     ofsInsert.flush();
